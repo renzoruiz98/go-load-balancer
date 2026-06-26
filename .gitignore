@@ -11,7 +11,7 @@
 coverage.out
 c.out
 
-# Env & sec
+# env & sec
 .env
 .env.local
 .env.*
