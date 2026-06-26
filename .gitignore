@@ -1,0 +1,37 @@
+# Bin & Test
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+/proxy
+/go-load-balancer
+coverage.out
+c.out
+
+# Env & sec
+.env
+.env.local
+.env.*
+*.pem
+*.key
+*.cert
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.project
+.settings/
+
+# SO
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
