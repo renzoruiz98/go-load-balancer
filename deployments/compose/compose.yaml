@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  lb:
+    build:
+      context: ../../
+      dockerfile: deployments/docker/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - backend1
+      - backend2
+      - backend3
+
+  # node 1
+  backend1:
+    image: traefik/whoami
+    hostname: backend1
+
+  # node 2
+  backend2:
+    image: traefik/whoami
+    hostname: backend2
+
+  # node 3
+  backend3:
+    image: traefik/whoami
+    hostname: backend3
