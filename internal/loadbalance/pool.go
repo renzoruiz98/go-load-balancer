@@ -1,9 +1,11 @@
 package loadbalance
 
 import (
+	"log"
 	"net/http/httputil"
 	"net/url"
 	"sync"
+	"time"
 )
 
 // destination server
@@ -45,4 +47,23 @@ func (b *Backend) IsAlive() bool {
 	alive := b.Alive
 	b.mux.RUnlock()
 	return alive
+}
+
+func (s *ServerPool) HealthCheck() {
+	for _, b := range s.backends {
+		status := isBackendLive(b.URL)
+		b.SetAlive(status)
+	}
+}
+
+func (s *ServerPool) StartHealthCheck(interval time.Duration) {
+	ticker := time.NewTicker(interval)
+
+	go func() {
+		for {
+			<-ticker.C
+			log.Println("StartHealthCheck")
+			s.HealthCheck()
+		}
+	}()
 }

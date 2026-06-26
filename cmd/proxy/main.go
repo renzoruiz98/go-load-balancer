@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/renzoruiz98/go-load-balancer/internal/loadbalance"
 	"github.com/renzoruiz98/go-load-balancer/internal/proxy"
@@ -49,6 +50,7 @@ func main() {
 		http.Error(w, "No backends available", http.StatusServiceUnavailable)
 	})
 
+	serverPool.StartHealthCheck(10 * time.Second)
 	port := "8080"
 	fmt.Printf("lb listening on port %s\n", port)
 
