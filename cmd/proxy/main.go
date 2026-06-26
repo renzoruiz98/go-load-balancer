@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/renzoruiz98/go-load-balancer/internal/proxy"
 )
 
 /*
@@ -11,16 +13,23 @@ In general term the function main run the server and verify the status the serve
 */
 
 func main() {
-	port := "8080"
-	fmt.Printf("initializing lb in port %s\n", port)
+	targetURL := "http://localhost:3001"
 
-	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("pong"))
+	reverseProxy, err := proxy.NewProxy(targetURL)
+	if err != nil {
+		log.Fatal(err)
+	}
 
-		if err := http.ListenAndServe(port, nil); err != nil {
-			log.Fatalf("Error in server", err)
-		}
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		reverseProxy.ServeHTTP(w, r)
 	})
+
+	port := "8080"
+	fmt.Printf("lb listening on port %s\n", port)
+	fmt.Println("Redirecting all traffic to -> %s\\n\"", targetURL)
+
+	if err := http.ListenAndServe(":"+port, nil); err != nil {
+		log.Fatal(err)
+	}
 
 }
