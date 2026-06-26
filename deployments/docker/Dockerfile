@@ -1,4 +1,20 @@
-FROM ubuntu:latest
-LABEL authors="r-abalos"
+FROM golang:1.25-alpine AS builder
 
-ENTRYPOINT ["top", "-b"]
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY . .
+
+RUN CGO_ENABLED=0 GOOS=linux go build -o /app/bin/proxy cmd/proxy/main.go
+
+FROM alpine:latest
+
+WORKDIR /root/
+
+COPY --from=builder /app/bin/proxy .
+
+EXPOSE 8080
+
+CMD ["./proxy"]

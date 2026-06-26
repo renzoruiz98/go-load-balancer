@@ -19,9 +19,9 @@ In general term the function main run the server and verify the status the serve
 
 func main() {
 	serverList := []string{
-		"http://localhost:3001",
-		"http://localhost:3002",
-		"http://localhost:3003",
+		"http://backend1:80",
+		"http://backend2:80",
+		"http://backend3:80",
 	}
 
 	serverPool := loadbalance.ServerPool{}

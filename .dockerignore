@@ -1,0 +1,20 @@
+.git
+.gitignore
+.github
+
+# Bin
+*.exe
+*.test
+*.out
+coverage.out
+
+# IaC
+deployments/compose/
+deployments/grafana/
+docker-compose.yml
+Dockerfile
+
+# IDE
+.idea/
+.vscode/
+.env
