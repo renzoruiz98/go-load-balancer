@@ -7,8 +7,10 @@ import (
 	"net/url"
 	"time"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/renzoruiz98/go-load-balancer/internal/loadbalance"
 	"github.com/renzoruiz98/go-load-balancer/internal/proxy"
+	"github.com/renzoruiz98/go-load-balancer/internal/telemetry"
 )
 
 /*
@@ -42,18 +44,25 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+
 		peer := serverPool.GetNextPeer()
 		if peer != nil {
+			backendName := peer.URL.Host
 			peer.ReverseProxy.ServeHTTP(w, r)
+			duration := time.Since(start).Seconds()
+			telemetry.RequestDuration.WithLabelValues(backendName).Observe(duration)
+			telemetry.TotalRequests.WithLabelValues(backendName, "200").Inc()
 			return
 		}
-		http.Error(w, "No backends available", http.StatusServiceUnavailable)
+		telemetry.TotalRequests.WithLabelValues("unknown", "503").Inc()
+		http.Error(w, "servers not available", http.StatusServiceUnavailable)
 	})
 
 	serverPool.StartHealthCheck(10 * time.Second)
 	port := "8080"
 	fmt.Printf("lb listening on port %s\n", port)
-
+	http.Handle("/metrics", promhttp.Handler())
 	if err := http.ListenAndServe(":"+port, nil); err != nil {
 		log.Fatal(err)
 	}
